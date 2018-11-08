@@ -246,7 +246,7 @@ with graph.as_default():
   saver = tf.train.Saver()
 
 # Step 5: Begin training.
-num_steps = 500 #100001
+num_steps = 100001
 
 with tf.Session(graph=graph) as session:
   # Open a writer to write summaries.
