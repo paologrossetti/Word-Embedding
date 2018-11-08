@@ -2,13 +2,13 @@ def total_score(word_scores):
     total_score = 0.0
     sum = 0.0
     for score in word_scores:
-        total_score = total_score + score[0] / float(score[1])
-        sum = sum + 1.0 / float(score[1])
+        total_score += score[0] / float(score[1])
+        sum += 1.0 / float(score[1])
     total_score = total_score / sum
     return total_score
 
 def calculate_sentiment(word):
-    swn_path = "/home/paolo/Scaricati/home/swn/www/admin/dump/SentiWordNet_3.0.0_20130122.txt"
+    swn_path = "/Users/lorenzobraconi/Desktop/WordEmbedding/SentiWordNet_3.0.0_20130122.txt"
     score_sentiment = 0
     word_scores = []
     with open(swn_path,'r') as swn:
