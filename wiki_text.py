@@ -1,6 +1,8 @@
 import json
 import os
 
+import re
+
 i=0
 path_json_directory = '/home/paolo/Scrivania/json'
 with open('/home/paolo/Scrivania/wiki.txt','a+') as output:
@@ -14,8 +16,11 @@ with open('/home/paolo/Scrivania/wiki.txt','a+') as output:
                     try:
                         data=json.loads(article)
                         text_with_title = data['text']
-                        text = text_with_title.split("\n\n",1)[1]
-                        output.write(text.encode('utf8'))
+                        text_with_newline = text_with_title.split("\n\n",1)[1]
+                        text = text_with_newline.replace('\n',' ')
+                        regex = r"( [A-Z][a-z]?)\."
+                        text_clean = re.sub(regex,"",text)
+                        output.write(text_clean.encode('utf8'))
                     except IndexError:
                         print (os.path.join(path, name),data['title'],'No testo per questo titolo')
                     except ValueError:
