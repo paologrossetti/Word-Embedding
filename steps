@@ -1,0 +1,7 @@
+
+___09 11 2018___
+
+1 - scaricato dump wiki inglese semplificato in xml zippato (188 mb compressi)
+2 - scaricato il WikiExtractor di attardi -- https://github.com/attardi/wikiextractor
+3 - eseguito wiki extractor sul file del punto 1 utilizzando opzione json -- python WikiExtractor-attardi.py -o /home/paolo/Scrivania/json --json /home/paolo/Scaricati/simplewiki-20170820-pages-meta-current.xml.bz2
+4 - abbiamo creato wiki_text.py per ottenere il dump in txt a partire dai json del punto 3, prendendo solo il valore della chiave text
