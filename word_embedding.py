@@ -73,7 +73,7 @@ def maybe_download(filename, expected_bytes):
 
 #filename = maybe_download('text8.zip', 31344016)
 
-filename = '/home/paolo/Scrivania/wiki.txt'
+filename = '/home/paolo/Scrivania/dataset_lemmatization.txt'
 
 # Read the data into a list of strings. Unzippa il dataset e lo trasforma come lista di parole.
 def read_data(filename):
@@ -325,7 +325,7 @@ np.savetxt("/home/paolo/Scrivania/word.csv",final_embeddings,delimiter=",")
 
 import csv
 with open('/home/paolo/Scrivania/word.csv','r') as csvinput:
-    with open('/home/paolo/Scrivania/output.csv', 'w') as csvoutput:
+    with open('/home/paolo/Scrivania/word-embedding.csv', 'w') as csvoutput:
         writer = csv.writer(csvoutput, lineterminator='\n')
         reader = csv.reader(csvinput)
 
@@ -376,7 +376,8 @@ try:
   plot_only = 500
   low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
   labels = [reverse_dictionary[i] for i in xrange(plot_only)]
-  plot_with_labels(low_dim_embs, labels, '/home/paolo/Scrivania/tsne.png')
+  labels_decoded = [label.decode('UTF8') for label in labels]
+  plot_with_labels(low_dim_embs, labels_decoded, '/home/paolo/Scrivania/tsne.png')
 
 except ImportError as ex:
   print('Please install sklearn, matplotlib, and scipy to show embeddings.')
