@@ -4,8 +4,8 @@ import os
 import re
 
 i=0
-path_json_directory = '/home/paolo/Scrivania/json'
-with open('/home/paolo/Scrivania/wiki.txt','a+') as output:
+path_json_directory = '/Users/lorenzobraconi/Desktop/json'
+with open('/Users/lorenzobraconi/Desktop/wiki.txt','a+') as output:
     for path, subdirs, files in os.walk(path_json_directory):
         for name in files:
             i=i+1

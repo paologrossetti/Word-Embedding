@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import nltk
 import re
 
@@ -21,10 +22,10 @@ def get_wordnet_pos(treebank_tag):
     else:
         return ''
 
-wiki_path = '/home/paolo/Scrivania/wiki.txt'
+wiki_path = '/Users/lorenzobraconi/Desktop/wiki.txt'
 regex = '(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s'
 
-with open('/home/paolo/Scrivania/dataset_lemmatization.txt','a+') as output:
+with open('/Users/lorenzobraconi/Desktop/dataset_lemmatization.txt','a+') as output:
     with open(wiki_path,'r') as wiki:
         wnl = WordNetLemmatizer()
         text = wiki.read()
@@ -35,10 +36,10 @@ with open('/home/paolo/Scrivania/dataset_lemmatization.txt','a+') as output:
             for token_pos in tokens_pos:
                 pos_word = get_wordnet_pos(token_pos[1])
                 if pos_word!='':
-                    lemma = wnl.lemmatize(token_pos[0].encode('utf8'), pos_word)
+                    lemma = wnl.lemmatize(token_pos[0].decode('utf8'), pos_word)
                 else:
-                    lemma = wnl.lemmatize(token_pos[0].encode('utf8'))
-                output.write(lemma.encode('utf8'))
+                    lemma = wnl.lemmatize(token_pos[0].decode('utf8'))
+                output.write(lemma.encode('utf8')+' ')
 
 
 
@@ -46,5 +47,5 @@ with open('/home/paolo/Scrivania/dataset_lemmatization.txt','a+') as output:
 
 
 
-print(wnl.lemmatize("TyszkiewiczównaKalenicka",get_wordnet_pos('NN')))
+#print(wnl.lemmatize("TyszkiewiczównaKalenicka",get_wordnet_pos('NN')))
 
