@@ -43,12 +43,15 @@ with open(swn_path, 'r') as swn, open('/Users/lorenzobraconi/Desktop/output2.csv
     with open('/Users/lorenzobraconi/Desktop/word_sentiment.csv', 'w') as senti_we, open('/Users/lorenzobraconi/Desktop/we_in_swnet.csv','w') as we_in_swnet:
         writer_ws = csv.writer(senti_we, lineterminator='\n')
         writer_wis = csv.writer(we_in_swnet, lineterminator='\n')
+        i=0
         for row in reader:
+            i += 1
+            print i
             sentiment = calculate_sentiment(row[0], content)
             if sentiment != 'Not found':
                 senti_class = classified_sentiment(sentiment)
                 writer_ws.writerow([row[0], senti_class, sentiment])
-                writer_wis.writerow(row)
+                writer_wis.writerow([senti_class] + row)
 
 
 
