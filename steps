@@ -1,11 +1,9 @@
 
-___09 11 2018___
-
 1 - scaricato dump wiki inglese semplificato in xml zippato (188 mb compressi)
 2 - scaricato il WikiExtractor di attardi -- https://github.com/attardi/wikiextractor
 3 - eseguito wiki extractor sul file del punto 1 utilizzando opzione json -- python WikiExtractor-attardi.py -o /home/paolo/Scrivania/json --json /home/paolo/Scaricati/simplewiki-20170820-pages-meta-current.xml.bz2
 4 - abbiamo creato wiki_text.py per ottenere il dump in txt a partire dai json del punto 3, prendendo solo il valore della chiave text
-5 - abbiamo creato il dataset lemmatizzato grazie al file lemmatization.py
-6 - modificato calculate_sentiment: per ogni parola del word-embedding.csv presente in SentiWordNet, abbiamo calcolato il sentiment e assegnato ad una classe (word_sentiment.csv).
+5 - abbiamo creato il dataset lemmatizzato, del tipo parola#pos,eliminando la punteggiatura e portando tutto a minuscolo. Codice:lemmatization.py
+6 - modificato calculate_sentiment: per ogni parola del word-embedding.csv presente in SentiWordNet, abbiamo calcolato il sentiment (basato sul pos della parola) e assegnato ad una classe (word_sentiment.csv).
     Abbiamo poi pulito il file word-embedding.csv eliminando le parole non presenti in SentiWordNet creando il file we_in_swnet.csv aggiungendo una colonna relativa al sentiment.
 7 - knn in progress

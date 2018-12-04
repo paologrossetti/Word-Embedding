@@ -376,7 +376,11 @@ try:
   plot_only = 500
   low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
   labels = [reverse_dictionary[i] for i in xrange(plot_only)]
-  labels_decoded = [label.decode('UTF8') for label in labels]
+  #labels_decoded = [label.decode('UTF8') for label in labels]
+  labels_decoded=[]
+  for label in labels:
+      word = label[:-2]
+      labels_decoded.append(word.decode('UTF8'))
   plot_with_labels(low_dim_embs, labels_decoded, '/home/paolo/Scrivania/tsne.png')
 
 except ImportError as ex:

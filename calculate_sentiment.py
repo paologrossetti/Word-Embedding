@@ -7,21 +7,23 @@ def total_score(word_scores):
     average_score = total_score / len(word_scores)
     return average_score
 
-def calculate_sentiment(word, content):
-    score_sentiment = 0
+def calculate_sentiment(word_pos, content):
     word_scores = []
     for row in content:
         if not row.strip().startswith('#'):
             list_of_row = row.split('\t')
-            wordTypeMarker = list_of_row[0]
             if not len(list_of_row)==6:
                 raise Exception('Tabulazione errata nel file')
-            synTermsSplit = list_of_row[4].split(' ')
-            for synTermSplit in synTermsSplit:
-                synTermAndRank = synTermSplit.split('#')
-                if word == synTermAndRank[0]:
-                   word_score = float(list_of_row[2]) - float(list_of_row[3])
-                   word_scores.append([word_score,synTermAndRank[1]])
+            pos_row = list_of_row[0]
+            word = word_pos[:-2]
+            pos = word_pos[-1:]
+            if pos == pos_row:
+                synTermsSplit = list_of_row[4].split(' ')
+                for synTermSplit in synTermsSplit:
+                    synTermAndRank = synTermSplit.split('#')
+                    if word == synTermAndRank[0]:
+                       word_score = float(list_of_row[2]) - float(list_of_row[3])
+                       word_scores.append([word_score,synTermAndRank[1]])
     if word_scores:
         score_sentiment = total_score(word_scores)
         return score_sentiment
@@ -36,11 +38,11 @@ def classified_sentiment(sentiment):
     else:
         return 'Positivo'
 
-swn_path = '/Users/lorenzobraconi/Desktop/SentiWordNet_3.0.0_20130122.txt'
-with open(swn_path, 'r') as swn, open('/Users/lorenzobraconi/Desktop/output2.csv','r') as word_embedding:
+swn_path = '/home/paolo/Scaricati/home/swn/www/admin/dump/SentiWordNet_3.0.0_20130122.txt'
+with open(swn_path, 'r') as swn, open('/home/paolo/Scrivania/word-embedding.csv','r') as word_embedding:
     content = swn.readlines()
     reader = csv.reader(word_embedding)
-    with open('/Users/lorenzobraconi/Desktop/word_sentiment.csv', 'w') as senti_we, open('/Users/lorenzobraconi/Desktop/we_in_swnet.csv','w') as we_in_swnet:
+    with open('/home/paolo/Scrivania/word_sentiment.csv', 'w') as senti_we, open('/home/paolo/Scrivania/we_in_swnet.csv','w') as we_in_swnet:
         writer_ws = csv.writer(senti_we, lineterminator='\n')
         writer_wis = csv.writer(we_in_swnet, lineterminator='\n')
         i=0
@@ -52,7 +54,12 @@ with open(swn_path, 'r') as swn, open('/Users/lorenzobraconi/Desktop/output2.csv
                 senti_class = classified_sentiment(sentiment)
                 writer_ws.writerow([row[0], senti_class, sentiment])
                 writer_wis.writerow([senti_class] + row)
-
+'''
+swn_path = '/home/paolo/Scaricati/home/swn/www/admin/dump/SentiWordNet_3.0.0_20130122.txt'
+with open(swn_path, 'r') as swn, open('/home/paolo/Scrivania/word-embedding.csv','r') as word_embedding:
+    content = swn.readlines()
+    print calculate_sentiment('not#r',content)
+'''
 
 
 
