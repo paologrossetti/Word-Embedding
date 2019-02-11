@@ -1,17 +1,3 @@
-# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
 """Basic word2vec example."""
 
 from __future__ import absolute_import
@@ -26,6 +12,7 @@ import argparse
 import random
 from tempfile import gettempdir
 import zipfile
+from scipy import spatial
 
 import numpy as np
 from six.moves import urllib
@@ -50,38 +37,9 @@ FLAGS, unparsed = parser.parse_known_args()
 if not os.path.exists(FLAGS.log_dir):
   os.makedirs(FLAGS.log_dir)
 
-# Step 1: Download the data.
-url = 'http://mattmahoney.net/dc/'
+filename = '/home/paolo/Scrivania/dataset_lemmatization.txt' #path del file che abbiamo prodotto in lemmatization.py
 
-
-# pylint: disable=redefined-outer-name. Scarica il dataset dall'url http://mattmahoney.net/dc/ se non presente nella cartella /tmp
-def maybe_download(filename, expected_bytes):
-  """Download a file if not present, and make sure it's the right size."""
-  local_filename = '/home/paolo/Scrivania/text8.zip'#os.path.join(gettempdir(), filename)
-  if not os.path.exists(local_filename):
-    local_filename, _ = urllib.request.urlretrieve(url + filename,
-                                                   local_filename)
-  statinfo = os.stat(local_filename)
-  if statinfo.st_size == expected_bytes:
-    print('Found and verified', filename)
-  else:
-    print(statinfo.st_size)
-    raise Exception('Failed to verify ' + local_filename +
-                    '. Can you get to it with a browser?')
-  return local_filename
-
-
-#filename = maybe_download('text8.zip', 31344016)
-
-filename = '/home/paolo/Scrivania/dataset_lemmatization.txt'
-
-# Read the data into a list of strings. Unzippa il dataset e lo trasforma come lista di parole.
-def read_data(filename):
-  """Extract the first file enclosed in a zip file as a list of words."""
-  with zipfile.ZipFile(filename) as f:
-    data = tf.compat.as_str(f.read(f.namelist()[0])).split() #Legge gli elementi dell'archivio, li trasforma come stringa e ottiene le parole tramite lo split
-  return data
-
+#Step1
 def read_wiki(filename):
     with open(filename,'r') as testo:
         data = [word for line in testo for word in line.split()]
@@ -139,14 +97,14 @@ def generate_batch(batch_size, num_skips, skip_window): # -- Consente di creare 
   buffer = collections.deque(maxlen=span)  # pylint: disable=redefined-builtin
   if data_index + span > len(data):
     data_index = 0
-  buffer.extend(data[data_index:data_index + span])
+  buffer.extend(data[data_index:data_index + span]) #Prendo gli SPAN indici della lista data
   data_index += span
   for i in range(batch_size // num_skips):
-    context_words = [w for w in range(span) if w != skip_window]
+    context_words = [w for w in range(span) if w != skip_window] #le parole che fanno parte del contesto sono quelle che si trovano a sx e dx della parola target in [context target contezt]
     words_to_use = random.sample(context_words, num_skips)
-    for j, context_word in enumerate(words_to_use):
-      batch[i * num_skips + j] = buffer[skip_window]
-      labels[i * num_skips + j, 0] = buffer[context_word]
+    for j, context_word in enumerate(words_to_use): #ciclo sulle parole del contesto
+      batch[i * num_skips + j] = buffer[skip_window] #scrivo l'indice della parola target
+      labels[i * num_skips + j, 0] = buffer[context_word] #scrivo gli indice delle parole del contest, per quella parola target
     if data_index == len(data):
       buffer.extend(data[0:span])
       data_index = span
@@ -165,10 +123,10 @@ for i in range(8):
 
 # Step 4: Build and train a skip-gram model.
 
-batch_size = 128
-embedding_size = 128  # Dimension of the embedding vector.
+batch_size = 128 #numero di parole che cosidero nella generazione del batch
+embedding_size = 128  # Dimension of the embedding vector. --- numero di feature del word embedding
 skip_window = 1  # How many words to consider left and right.
-num_skips = 2  # How many times to reuse an input to generate a label.
+num_skips = 2  # How many times to reuse an input to generate a label. -- quante volte una parola viene usata come contesto
 num_sampled = 64  # Number of negative examples to sample.
 
 # We pick a random validation set to sample nearest neighbors. Here we limit the
@@ -192,10 +150,10 @@ with graph.as_default():
   # Ops and variables pinned to the CPU because of missing GPU implementation
   with tf.device('/cpu:0'):
     # Look up embeddings for inputs.
-    with tf.name_scope('embeddings'):
+    with tf.name_scope('embeddings'): #embeddings : righe del word embedding
       embeddings = tf.Variable(
-          tf.random_uniform([vocabulary_size, embedding_size], -1.0, 1.0))
-      embed = tf.nn.embedding_lookup(embeddings, train_inputs)
+          tf.random_uniform([vocabulary_size, embedding_size], -1.0, 1.0)) #tutte le celle del word embedding sono inizializzate a valori random, tra -1 e 1(non compreso).
+      embed = tf.nn.embedding_lookup(embeddings, train_inputs) #embed contiene i vettori del word embedding corrispondenti alle parole del train_inputs   #params=embeddings e ids=train_inputs
 
     # Construct the variables for the NCE loss
     with tf.name_scope('weights'):
@@ -246,7 +204,7 @@ with graph.as_default():
   saver = tf.train.Saver()
 
 # Step 5: Begin training.
-num_steps = 100001
+num_steps = 100001 #numero di iterazioni
 
 with tf.Session(graph=graph) as session:
   # Open a writer to write summaries.
@@ -319,25 +277,20 @@ with tf.Session(graph=graph) as session:
 
 writer.close()
 
-np.savetxt("/home/paolo/Scrivania/word.csv",final_embeddings,delimiter=",")
+np.savetxt("/home/paolo/Scrivania/word.csv",final_embeddings,delimiter=",") #file d'appoggio prodotto
 
 
 
 import csv
 with open('/home/paolo/Scrivania/word.csv','r') as csvinput:
-    with open('/home/paolo/Scrivania/word-embedding.csv', 'w') as csvoutput:
+    with open('/home/paolo/Scrivania/word-embedding.csv', 'w') as csvoutput: #file di output del Word Embedding
         writer = csv.writer(csvoutput, lineterminator='\n')
         reader = csv.reader(csvinput)
 
         all = []
-        #row = next(reader)
-        #row.append('Parola')
-        #all.append(row)
         i=0
-        for row in reader:
-            #row.append(reverse_dictionary[i])
+        for row in reader: #prendiamo il file d'appoggio e nella prima colonna, per ogni riga, scriviamo la parola associata al vettore di features
             all.append([reverse_dictionary[i]]+row)
-            #all.append(row)
             i+=1
 
         writer.writerows(all)
@@ -376,7 +329,6 @@ try:
   plot_only = 500
   low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
   labels = [reverse_dictionary[i] for i in xrange(plot_only)]
-  #labels_decoded = [label.decode('UTF8') for label in labels]
   labels_decoded=[]
   for label in labels:
       word = label[:-2]
